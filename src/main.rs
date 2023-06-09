@@ -2,6 +2,7 @@ use std::{path::Path, process};
 
 use clap::{Args, Parser, Subcommand};
 
+mod crop;
 mod resize;
 
 #[derive(Parser)]
@@ -18,6 +19,8 @@ struct Cli {
 enum Commands {
     /// Resizes images
     Resize(ResizeArgs),
+    /// Crops images
+    Crop(CropArgs),
 }
 
 #[derive(Args)]
@@ -44,6 +47,28 @@ struct ResizeArgs {
     filter: String,
 }
 
+#[derive(Args)]
+struct CropArgs {
+    /// Path to image to crop
+    input: String,
+    /// Path to which to write cropped image. If empty, "-out" will be appended
+    /// to the basename of the input file.
+    #[arg(long, default_value = "")]
+    output: String,
+    /// Left cropping boundary. Top-left is treated as origin.
+    #[arg(long)]
+    x: u32,
+    /// Top of cropping boundary. Top-left is treated as origin.
+    #[arg(long)]
+    y: u32,
+    /// Width of cropping boundary. Top-left is treated as origin.
+    #[arg(long)]
+    width: u32,
+    /// Height of cropping boundary. Top-left is treated as origin.
+    #[arg(long)]
+    height: u32,
+}
+
 fn check_file(file: &String) {
     let f = Path::new(file);
     if !(f.exists() && f.is_file()) {
@@ -54,7 +79,6 @@ fn check_file(file: &String) {
 
 fn main() {
     let cli = Cli::parse();
-
     let exit_code = match &cli.command {
         Commands::Resize(args) => {
             check_file(&args.input);
@@ -65,6 +89,17 @@ fn main() {
                 args.height,
                 args.percent,
                 &args.filter,
+            )
+        }
+        Commands::Crop(args) => {
+            check_file(&args.input);
+            crop::crop(
+                &args.input,
+                &args.output,
+                args.x,
+                args.y,
+                args.width,
+                args.height,
             )
         }
     };
