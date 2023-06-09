@@ -26,4 +26,11 @@ rimp resize --width 100 --height 100 --output ./image2.png ./image.png
 
 # Resize ./image.png and convert to JPEG
 rimp resize --width 100 --height 100 --output ./image-out.jpg ./image.png
+
+#############
+# Crop
+#############
+
+# Crop ./image.png to ./image-out.png to a 200x200 square, 100px from the top-left corner
+rimp crop --x 100 --y 100 --width 200 --height 200 ./image.png
 ```

@@ -3,6 +3,8 @@ use std::{fs, path::Path};
 use image::io::Reader as ImageReader;
 use image::{imageops::FilterType, DynamicImage, ImageError};
 
+use rimp::get_new_file_path;
+
 pub fn resize(
     input: &str,
     output: &str,
@@ -60,21 +62,4 @@ fn get_new_dimensions(img: &DynamicImage, width: i32, height: i32, percent: f64)
         new_height = (img.height() as f64 * percent / 100.0).round() as u32;
     }
     (new_width, new_height)
-}
-
-fn get_new_file_path(input: &str, output: &str) -> Result<String, ImageError> {
-    if !output.is_empty() {
-        return Ok(String::from(output));
-    }
-    let canon_input = fs::canonicalize(Path::new(input))?;
-    let parent = canon_input.parent().unwrap();
-    let new_file_path = format!(
-        "{}-out.{}",
-        parent
-            .join(canon_input.file_stem().unwrap())
-            .to_str()
-            .unwrap(),
-        canon_input.extension().unwrap().to_str().unwrap()
-    );
-    Ok(new_file_path)
 }
